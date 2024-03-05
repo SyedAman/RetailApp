@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product: one
+  request_data: 2024-03-05 09:42:12
+
+two:
+  product: two
+  request_data: 2024-03-05 09:42:12
