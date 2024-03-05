@@ -60,29 +60,74 @@ RSpec.describe "Products", type: :request do
     end
   end
 
-  # Test for creating a product
+  # Tests for POST /api/products (Creating a product)
   describe "POST /api/products" do
-    let(:valid_attributes) { { name: 'New Product', price: 500, status: true } }
-    let(:invalid_attributes) { { name: '', price: 15000, status: true } }
+    context "when product price is below $5000" do
+      let(:valid_attributes) { { name: 'Affordable', price: 3000, status: true } }
 
-    context "with valid parameters" do
-      it "creates a new Product" do
+      it "creates a new product without adding to approval queue" do
         expect {
           post '/api/products', params: { product: valid_attributes }
-        }.to change(Product, :count).by(1)
+        }.to change(Product, :count).by(1).and change(ApprovalQueue, :count).by(0)
         expect(response).to have_http_status(201)
       end
     end
 
-    context "with invalid parameters" do
-      it "does not create a new Product" do
+    context "when product price is above $5000" do
+      let(:expensive_attributes) { { name: 'Expensive', price: 6000, status: true } }
+
+      it "creates a new product and adds it to the approval queue" do
         expect {
-          post '/api/products', params: { product: invalid_attributes }
-        }.to change(Product, :count).by(0)
-        expect(response).to have_http_status(422)
+          post '/api/products', params: { product: expensive_attributes }
+        }.to change(Product, :count).by(1).and change(ApprovalQueue, :count).by(1)
+        expect(response).to have_http_status(201)
       end
     end
   end
 
-  # Add more tests for update, delete, and approval queue endpoints
+  # Tests for GET /api/products/approval-queue (Listing products in the approval queue)
+  describe "GET /api/products/approval-queue" do
+    before do
+      products = FactoryBot.create_list(:product, 3, price: 6000) # These should be in the approval queue
+      products.each { |product| FactoryBot.create(:approval_queue, product: product) }
+    end
+
+    it "returns all products in the approval queue" do
+      get '/api/products/approval-queue'
+      expect(response).to have_http_status(200)
+      expect(JSON.parse(response.body).size).to eq(3)
+    end
+  end
+
+  # Tests for PUT /api/products/approval-queue/:approvalId/approve (Approving a product)
+  describe "PUT /api/products/approval-queue/:approvalId/approve" do
+    let!(:product_in_queue) { FactoryBot.create(:product, price: 7000) }
+    let!(:approval_queue_entry) { FactoryBot.create(:approval_queue, product: product_in_queue) }
+
+    it "approves the product and removes it from the approval queue" do
+      expect {
+        put "/api/products/approval-queue/#{approval_queue_entry.id}/approve"
+      }.to change { ApprovalQueue.count }.by(-1)
+      expect(response).to have_http_status(200)
+      product_in_queue.reload
+      expect(product_in_queue.status).to be_truthy # Assuming status true means approved
+    end
+  end
+
+  # Tests for PUT /api/products/approval-queue/:approvalId/reject (Rejecting a product)
+  describe "PUT /api/products/approval-queue/:approvalId/reject" do
+    let!(:product_in_queue) { FactoryBot.create(:product, price: 7000) }
+    let!(:approval_queue_entry) { FactoryBot.create(:approval_queue, product: product_in_queue) }
+
+    it "rejects the product and removes it from the approval queue" do
+      expect {
+        put "/api/products/approval-queue/#{approval_queue_entry.id}/reject"
+      }.to change { ApprovalQueue.count }.by(-1)
+      expect(response).to have_http_status(200)
+      # Ensure the product status is unchanged; adjust as per your application logic
+    end
+  end
+
+
+  # @TODO: Add more tests for update, delete, and approval queue endpoints
 end

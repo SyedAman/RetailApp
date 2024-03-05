@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_05_144212) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_05_201553) do
   create_table "approval_queues", force: :cascade do |t|
     t.integer "product_id", null: false
     t.datetime "request_data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "request_date"
     t.index ["product_id"], name: "index_approval_queues_on_product_id"
   end
 
