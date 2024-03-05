@@ -33,7 +33,13 @@ class Api::ProductsController < ApplicationController
   end
 
   def update
+    previous_price = @product.price
     if @product.update(product_params)
+      # Check if the price has increased more than 50%
+      if @product.price > previous_price * 1.5
+        # Add product to the approval queue
+        ApprovalQueue.create(product: @product, request_date: Time.current)
+      end
       render json: @product
     else
       render json: @product.errors, status: :unprocessable_entity

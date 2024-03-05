@@ -110,7 +110,7 @@ RSpec.describe "Products", type: :request do
       }.to change { ApprovalQueue.count }.by(-1)
       expect(response).to have_http_status(200)
       product_in_queue.reload
-      expect(product_in_queue.status).to be_truthy # Assuming status true means approved
+      expect(product_in_queue.status).to be_truthy
     end
   end
 
@@ -124,10 +124,46 @@ RSpec.describe "Products", type: :request do
         put "/api/products/approval-queue/#{approval_queue_entry.id}/reject"
       }.to change { ApprovalQueue.count }.by(-1)
       expect(response).to have_http_status(200)
-      # Ensure the product status is unchanged; adjust as per your application logic
+      # Ensure the product status is unchanged; @TODO: Do we want to change this application logic?
     end
   end
 
+  # Tests for PUT /api/products/:id (Updating a product)
+  describe "PUT /api/products/:id" do
+    let!(:product) { FactoryBot.create(:product, price: 1000, status: true) }
 
-  # @TODO: Add more tests for update, delete, and approval queue endpoints
+    context "with valid parameters and price increase less than 50%" do
+      it "updates the product without adding to approval queue" do
+        updated_attributes = { name: 'Updated Product', price: 1200, status: true }
+        expect {
+          put "/api/products/#{product.id}", params: { product: updated_attributes }
+        }.to change(ApprovalQueue, :count).by(0)
+        expect(response).to have_http_status(200)
+        expect(product.reload.name).to eq('Updated Product')
+      end
+    end
+
+    context "with price increase more than 50%" do
+      it "updates the product and adds it to the approval queue" do
+        updated_attributes = { name: 'Expensive Update', price: 2000, status: true }
+        expect {
+          put "/api/products/#{product.id}", params: { product: updated_attributes }
+        }.to change(ApprovalQueue, :count).by(1)
+        expect(response).to have_http_status(200)
+      end
+    end
+  end
+
+  # Tests for DELETE /api/products/:id (Deleting a product)
+  describe "DELETE /api/products/:id" do
+    let!(:product) { FactoryBot.create(:product) }
+
+    it "deletes the product and adds it to the approval queue" do
+      expect {
+        delete "/api/products/#{product.id}"
+      }.to change(Product, :count).by(-1).and change(ApprovalQueue, :count).by(1)
+      expect(response).to have_http_status(204) # No content
+    end
+  end
+
 end
