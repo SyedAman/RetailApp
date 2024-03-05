@@ -4,6 +4,8 @@
 
 The application includes a series of RESTful API endpoints catering to product lifecycle management, including listing active products, searching for products based on various criteria, creating, updating, and deleting products, as well as managing an approval queue for products based on specific business rules.
 
+It follows Test Driven Development, tests are located in https://github.com/SyedAman/RetailApp/blob/master/spec/requests/products_spec.rb
+
 ## System Dependencies & Configuration`
 
 The application is built using Ruby on Rails, adhering to the MVC architectural pattern. Below are the key dependencies used:
