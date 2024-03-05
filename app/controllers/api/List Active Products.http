@@ -1,0 +1,57 @@
+### List Active Products
+GET http://localhost:3000/api/products
+Content-Type: application/json
+
+###
+
+### Search Products @TODO: Fix
+GET http://localhost:3000/api/products/search?productName=Nike&minPrice=50&maxPrice=150&minPostedDate=2024-01-01@maxPostedDate=2024-12-31
+Content-Type: application/json
+
+###
+
+### Create Product
+POST http://localhost:3000/api/products
+Content-Type: application/json
+
+{
+  "name": "Shoes",
+  "price": 100,
+  "status": true
+}
+
+###
+
+### Update a Product
+PUT http://localhost:3000/api/products/3
+Content-Type: application/json
+
+{
+  "name": "Shoes",
+  "price": 99,
+  "status": true
+}
+
+###
+
+### Delete a Product
+DELETE http://localhost:3000/api/products/1
+Content-Type: application/json
+
+###
+
+### Get Products in Approval Queue
+GET http://localhost:3000/api/products/approval-queue
+Content-Type: application/json
+
+###
+
+### Approve a Product
+PUT http://localhost:3000/api/products/approval-queue/1/approve
+Content-Type: application/json
+
+###
+
+### Reject a Product
+PUT http://localhost:3000/api/products/approval-queue/1/reject
+Content-Type: application/json
