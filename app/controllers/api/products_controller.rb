@@ -7,15 +7,25 @@ class Api::ProductsController < ApplicationController
   end
 
   def search
-    @products = Product.where('name LIKE ? AND price >= ? AND price <= ? AND created_at >= ? AND created_at <= ?',
-                              "%#{params[:productName]}%", params[:minPrice], params[:maxPrice],
-                              params[:minPostedDate], params[:maxPostedDate])
-    render json: @products
+    # Initialize an ActiveRecord::Relation object for products
+    query = Product.all
+
+    # Filter by parameters if they exist
+    query = query.where('name LIKE ?', "%#{params[:productName]}%") if params[:productName].present?
+    query = query.where('price >= ?', params[:minPrice]) if params[:minPrice].present?
+    query = query.where('price <= ?', params[:maxPrice]) if params[:maxPrice].present?
+    query = query.where('created_at >= ?', params[:minPostedDate]) if params[:minPostedDate].present?
+    query = query.where('created_at <= ?', params[:maxPostedDate]) if params[:maxPostedDate].present?
+
+    render json: query
   end
 
   def create
     @product = Product.new(product_params)
     if @product.save
+      if @product.price > 5000
+        ApprovalQueue.create(product: @product, request_date: Time.current)
+      end
       render json: @product, status: :created
     else
       render json: @product.errors, status: :unprocessable_entity
