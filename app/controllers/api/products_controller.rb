@@ -46,7 +46,12 @@ class Api::ProductsController < ApplicationController
     end
   end
 
+  # @TODO: Clarify with product whether we want to delete the product AND add to approval queue, or just add to approval queue and then delete when approved
+  # @TODO: Right now, we are adding to approval queue and then deleting the product, which requires some adjustments to the model
+  # @TODO: Alternative solution: soft delete the product instead of destroying it: @product.update(is_deleted: true) # or `deleted_at: Time.current` if using a timestamp
   def destroy
+    # Add product to the approval queue before destroying
+    ApprovalQueue.create(product_id: @product.id, request_date: Time.current)
     @product.destroy
     head :no_content
   end

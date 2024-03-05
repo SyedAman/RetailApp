@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_05_201553) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_05_204407) do
   create_table "approval_queues", force: :cascade do |t|
     t.integer "product_id", null: false
     t.datetime "request_data"
@@ -28,5 +28,4 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_05_201553) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "approval_queues", "products"
 end
