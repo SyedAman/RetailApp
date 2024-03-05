@@ -23,7 +23,7 @@ Content-Type: application/json
 ###
 
 ### Update a Product
-PUT http://localhost:3000/api/products/3
+PUT http://localhost:3000/api/products/2
 Content-Type: application/json
 
 {
@@ -35,7 +35,7 @@ Content-Type: application/json
 ###
 
 ### Delete a Product
-DELETE http://localhost:3000/api/products/1
+DELETE http://localhost:3000/api/products/2
 Content-Type: application/json
 
 ###
@@ -47,11 +47,11 @@ Content-Type: application/json
 ###
 
 ### Approve a Product
-PUT http://localhost:3000/api/products/approval-queue/1/approve
+PUT http://localhost:3000/api/products/approval-queue/2/approve
 Content-Type: application/json
 
 ###
 
 ### Reject a Product
-PUT http://localhost:3000/api/products/approval-queue/1/reject
+PUT http://localhost:3000/api/products/approval-queue/3/reject
 Content-Type: application/json
